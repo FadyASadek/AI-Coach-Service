@@ -1,24 +1,24 @@
-// src/app.js
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const multer = require('multer');
+// 1. Imports (موحدة كلها بنظام ES Modules)
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import multer from 'multer';
+import dotenv from 'dotenv';
 
-// استدعاء الكونترولر (تأكد أنك أنشأت الملف في الخطوات السابقة)
-const analysisController = require('./controllers/analysisController');
-const Analysis = require('./models/Analysis'); 
+// 2. Load Environment Variables (لازم تكون في البداية)
+dotenv.config();
+
+// 3. Import Controllers & Models (تأكد من إضافة .js في الآخر)
+import * as analysisController from './controllers/analysisController.js';
+import Analysis from './models/Analysis.js';
 
 const app = express();
 
-// Middlewares
+// 4. Middlewares
 app.use(cors());
 app.use(express.json());
 
-// إعداد Multer (لرفع الملفات في الذاكرة)
-const upload = multer({ storage: multer.memoryStorage() });
-
-// Database Connection
+// 5. Database Connection (استخدام متغير واحد واضح)
 const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/coaching_db';
 
 mongoose.connect(mongoURI)
@@ -28,16 +28,18 @@ mongoose.connect(mongoURI)
         console.log('💡 Hint: Make sure MongoDB is installed and running on your machine!');
     });
 
-// --- Routes ---
+// 6. Multer Config
+const upload = multer({ storage: multer.memoryStorage() });
 
-// 1. الترحيب
+// 7. --- Routes ---
+
+// الترحيب
 app.get('/', (req, res) => res.send('AI Coaching API is running... 🚀'));
 
-// 2. مسار التحليل الرئيسي (يستخدم الـ Controller والـ AI)
-// هذا هو الرابط الذي سنستخدمه في Postman
+// مسار التحليل الرئيسي
 app.post('/api/analyze', upload.single('file'), analysisController.analyzeFile);
 
-// 3. مسار لعرض كل التحليلات السابقة (للداشبورد)
+// مسار السجل
 app.get('/api/history', async (req, res) => {
     try {
         const history = await Analysis.find().sort({ createdAt: -1 });
@@ -47,6 +49,6 @@ app.get('/api/history', async (req, res) => {
     }
 });
 
-// تشغيل السيرفر
+// 8. تشغيل السيرفر
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));

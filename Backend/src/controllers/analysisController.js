@@ -1,9 +1,10 @@
-// src/controllers/analysisController.js
-const Analysis = require('../models/Analysis');
-const aiService = require('../Services/aiService'); // استدعاء خدمة الـ AI الجديدة
-const fileParser = require('../utils/fileParser');
+// 1. تحويل الـ require لـ import
+import Analysis from '../models/Analysis.js';
+import * as aiService from '../Services/aiService.js'; // تأكد من إضافة .js
+import * as fileParser from '../utils/fileParser.js';
 
-exports.analyzeFile = async (req, res) => {
+// 2. استخدام export const بدلاً من exports
+export const analyzeFile = async (req, res) => {
     try {
         // التحقق من وجود الملف
         if (!req.file) {
@@ -16,7 +17,6 @@ exports.analyzeFile = async (req, res) => {
         console.log("تم استخراج النص، جاري الإرسال للذكاء الاصطناعي...");
 
         // 2. تحليل البيانات باستخدام Gemini
-        // هذه الخطوة هي التي ستحول النص "المعجن" إلى JSON منظم
         const aiAnalysisResult = await aiService.analyzeStudentData(text);
 
         // 3. حفظ البيانات (النص الأصلي + التحليل المنظم) في قاعدة البيانات

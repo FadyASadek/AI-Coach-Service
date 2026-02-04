@@ -1,9 +1,9 @@
-const mammoth = require('mammoth');
+import mammoth from 'mammoth';
 
 /**
  * وظيفة لتحويل ملف Word إلى نص
  */
-exports.extractTextFromWord = async (buffer) => {
+export const extractTextFromWord = async (buffer) => {
     try {
         // خيارات إضافية لـ mammoth لو حبيت تحافظ على بعض التنسيقات
         const options = {

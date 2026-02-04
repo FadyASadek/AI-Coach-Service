@@ -123,6 +123,7 @@ body {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -194,18 +195,23 @@ body {
 .blue {
   background: #3b82f6;
 }
+
 .red {
   background: #ef4444;
 }
+
 .green {
   background: #10b981;
 }
+
 .purple {
   background: #8b5cf6;
 }
+
 .orange {
   background: #f59e0b;
 }
+
 .gold {
   background: #d97706;
 }
@@ -213,4 +219,11 @@ body {
 /* Utilities */
 .hidden {
   display: none !important;
+}
+
+#results-to-print {
+  overflow: visible !important;
+  /* عشان html2canvas يشوف كل العناصر */
+  height: auto !important;
+  background: #f8f9fa;
 }

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const analysisSchema = new mongoose.Schema({
     fileName: String,
@@ -17,4 +17,6 @@ const analysisSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Analysis', analysisSchema);
+// التصدير بنظام ES Modules
+const Analysis = mongoose.model('Analysis', analysisSchema);
+export default Analysis;
