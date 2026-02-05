@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 AI Coach Analyst (نظام تحليل بيانات اللاعبين)
 
-## Getting Started
+هذا المشروع عبارة عن منصة ذكية مبنية باستخدام **[Next.js](https://nextjs.org)**، تهدف إلى مساعدة المدربين في تحليل بيانات اللاعبين المستخرجة من ملفات Word باستخدام الذكاء الاصطناعي (**Google Gemini AI**).
 
-First, run the development server:
+---
+
+## 🛠️ أبرز التعديلات والمميزات الجديدة (Changelog)
+
+تم إجراء تحسينات جوهرية على واجهة المستخدم وتجربة المستخدم (UI/UX) لتسهيل عملية التحليل.
+
+### 1. الملفات الأساسية المعدلة
+
+- **`src/app/page.tsx`**:
+  - يحتوي على منطق الصفحة الرئيسية بالكامل (Logic & UI).
+  - تم دمج مكونات واجهة الرفع (Drag & Drop) وعرض النتائج.
+  - تمت إضافة منطق **"شريط الخطوات" (Steps Indicator)** لتوجيه المستخدم.
+  - تمت إضافة وظيفة **تحميل النموذج الفارغ** (`Download Template`) لمساعدة العميل.
+  - يحتوي على دوال التعامل مع الـ API (`startAnalysis`) وتحويل التقرير لـ PDF (`downloadPDF`).
+
+- **`src/app/globals.css`**:
+  - تمت إضافة تنسيقات CSS مخصصة (Custom Styles) للعناصر الجديدة التي تتطلب تفاصيل أكثر من Tailwind.
+  - تنسيقات خاصة بـ: `steps-container` (شريط الخطوات)، `btn-template` (زر النموذج)، وحركات الـ Loading (`spinner`, `pulse`).
+
+---
+
+### 2. المميزات التي تمت إضافتها (Features)
+
+#### ✅ توجيه المستخدم (User Guidance)
+
+تم إضافة قسم **"خطوات الاستخدام"** أعلى الصفحة في `page.tsx` لتوضيح المسار:
+
+1.  تحميل النموذج.
+2.  ملء البيانات.
+3.  الرفع والتحليل.
+
+#### ✅ نموذج البيانات (Template Download)
+
+- تمت إضافة زر **"تحميل نموذج فارغ"**.
+- يعتمد الزر على وجود ملف باسم `template.docx` داخل مجلد `public`.
+- **تنبيه للمطور:** تأكد دائماً من وجود ملف `public/template.docx`.
+
+#### ✅ تجربة الانتظار (Enhanced Loading)
+
+- بدلاً من كلمة "جاري التحميل" الثابتة، تظهر رسائل متغيرة ديناميكياً (مثلاً: "جاري قراءة الملف..." ثم "الذكاء الاصطناعي يكتب التوصيات...").
+- يعتمد هذا على `setTimeout` داخل دالة `startAnalysis` في ملف `page.tsx`.
+
+#### ✅ التحقق البصري (Visual Validation)
+
+- عند سحب ملف `.docx` صحيح، يتغير لون منطقة الرفع إلى **الأخضر** (باستخدام كلاسات CSS في `globals.css`) ليعطي إشارة نجاح فورية للمستخدم.
+
+---
+
+## 🚀 طريقة التشغيل (Getting Started)
+
+أولاً، قم بتشغيل سيرفر التطوير:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

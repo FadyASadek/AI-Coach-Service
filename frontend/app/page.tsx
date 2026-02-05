@@ -5,7 +5,7 @@ import jsPDF from 'jspdf';
 import { useState, ChangeEvent } from 'react';
 import Swal from 'sweetalert2';
 
-// Types Definitions
+// --- Types Definitions ---
 interface AnalysisData {
   personal_summary: string;
   medical_history: string[];
@@ -27,14 +27,17 @@ interface ResultCardProps {
 export default function AIAnalyzer() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingText, setLoadingText] = useState<string>('جاري التحليل...'); // نص التحميل المتغير
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
 
-  // 1. دالة تحميل التقرير (يجب أن تكون داخل الـ Component)
+  // --- دالة تحميل التقرير PDF ---
   const downloadPDF = async () => {
     const element = document.getElementById('results-to-print');
     if (!element || !analysisData) return;
 
+    // نستخدم نص تحميل خاص للتصدير
     setLoading(true);
+    setLoadingText('جاري إنشاء ملف PDF...');
 
     try {
       const canvas = await html2canvas(element, {
@@ -45,19 +48,16 @@ export default function AIAnalyzer() {
       });
 
       const imgData = canvas.toDataURL('image/png');
-
       const pdf = new jsPDF('p', 'mm', 'a4');
-
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-
       const imgWidth = pageWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
       let heightLeft = imgHeight;
       let position = 0;
 
-      // أول صفحة
+      // الصفحة الأولى
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
@@ -80,6 +80,8 @@ export default function AIAnalyzer() {
       Swal.fire({
         icon: 'success',
         title: 'تم تحميل التقرير كاملًا',
+        timer: 2000,
+        showConfirmButton: false
       });
     } catch (error) {
       console.error(error);
@@ -92,6 +94,7 @@ export default function AIAnalyzer() {
     }
   };
 
+  // --- معالجة اختيار الملف ---
   const handleFileChange = (file: File | undefined) => {
     if (file && file.name.endsWith(".docx")) {
       setSelectedFile(file);
@@ -100,10 +103,18 @@ export default function AIAnalyzer() {
     }
   };
 
+  // --- بدء التحليل ---
   const startAnalysis = async () => {
     if (!selectedFile) return;
+    
     setLoading(true);
     setAnalysisData(null);
+    
+    // سيناريو وهمي لرسائل التحميل (لتحسين تجربة المستخدم)
+    setLoadingText('جاري قراءة الملف واستخراج النصوص...');
+    setTimeout(() => setLoadingText('الذكاء الاصطناعي يقوم بتحليل البيانات الطبية...'), 2500);
+    setTimeout(() => setLoadingText('جاري كتابة التوصيات الغذائية والرياضية...'), 5000);
+
     const formData = new FormData();
     formData.append("file", selectedFile);
 
@@ -112,10 +123,14 @@ export default function AIAnalyzer() {
         method: "POST",
         body: formData,
       });
+      
       const result = await response.json();
+      
       if (!response.ok) throw new Error(result.error || "حدث خطأ في الخادم");
+      
       setAnalysisData(result.data);
-      Swal.fire({ icon: "success", title: "تم التحليل بنجاح!", timer: 2000 });
+      Swal.fire({ icon: "success", title: "تم التحليل بنجاح!", timer: 1500, showConfirmButton: false });
+
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "حدث خطأ غير متوقع";
       Swal.fire({ icon: "error", title: "فشل التحليل", text: errorMessage });
@@ -126,12 +141,57 @@ export default function AIAnalyzer() {
 
   return (
     <div className="container" dir="rtl">
+      {/* Header */}
       <header className="header">
         <div className="logo"><i className="fas fa-brain"></i> AI Coach Analyst</div>
-        <p>ارفع ملف بيانات اللاعب ودع الذكاء الاصطناعي يحلله لك</p>
+        <p>منصة ذكية لتحليل بيانات اللاعبين وبناء خطط تطوير شاملة</p>
       </header>
 
+      {/* --- UX: Steps Indicator (شريط الخطوات) --- */}
+      <div className="steps-container">
+        <div className="step-item">
+          <div className="step-number">1</div>
+          <div className="step-text">
+            <strong>حمل النموذج</strong>
+            <p>حمل ملف Word الفارغ</p>
+          </div>
+        </div>
+        <div className="step-line"></div>
+        <div className="step-item">
+          <div className="step-number">2</div>
+          <div className="step-text">
+            <strong>املأ البيانات</strong>
+            <p>أدخل بيانات اللاعب</p>
+          </div>
+        </div>
+        <div className="step-line"></div>
+        <div className="step-item">
+          <div className="step-number">3</div>
+          <div className="step-text">
+            <strong>ارفع وحلل</strong>
+            <p>ارفع الملف للتحليل</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Upload Card */}
       <div className="upload-card">
+        {/* زر تحميل النموذج */}
+        <div className="template-action">
+           <div className="hint-box">
+             <i className="fas fa-info-circle"></i>
+             <p className="hint-text">ابدأ بتحميل النموذج المعتمد من هنا</p>
+           </div>
+           <a 
+             href="/template.docx" 
+             download="نموذج_بيانات_اللاعب.docx" 
+             className="btn-template"
+           >
+             <i className="fas fa-file-download"></i> تحميل نموذج فارغ
+           </a>
+        </div>
+
+        {/* Drop Zone */}
         <div
           className={`drop-zone ${selectedFile ? 'has-file' : ''}`}
           onClick={() => document.getElementById('fileInput')?.click()}
@@ -149,7 +209,11 @@ export default function AIAnalyzer() {
             <div className="file-info">
               <i className="fas fa-file-word"></i>
               <span>{selectedFile.name}</span>
-              <i className="fas fa-times remove-file" onClick={(e) => { e.stopPropagation(); setSelectedFile(null); }}></i>
+              <i 
+                className="fas fa-times remove-file" 
+                title="إلغاء الملف"
+                onClick={(e) => { e.stopPropagation(); setSelectedFile(null); }}
+              ></i>
             </div>
           )}
           <input
@@ -161,29 +225,31 @@ export default function AIAnalyzer() {
           />
         </div>
 
+        {/* Action Button */}
         <button className="btn-primary" disabled={!selectedFile || loading} onClick={startAnalysis}>
-          <i className="fas fa-microchip"></i> {loading ? 'جاري التحليل...' : 'بدء التحليل الذكي'}
+          <i className="fas fa-microchip"></i> {loading ? 'جاري المعالجة...' : 'بدء التحليل الذكي'}
         </button>
       </div>
 
+      {/* Loading Indicator */}
       {loading && (
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>جاري قراءة الملف وتحليله بواسطة Coach AI...</p>
-          <small>قد يستغرق الأمر بضع ثوانٍ</small>
+          <p className="loading-text">{loadingText}</p>
         </div>
       )}
 
+      {/* Results Section */}
       {analysisData && (
         <div className="results-container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div className="results-header">
             <h2><i className="fas fa-clipboard-check"></i> تقرير التحليل</h2>
-            <button onClick={downloadPDF} className="btn-secondary" style={{ backgroundColor: '#27ae60', color: 'white', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', border: 'none' }}>
-              <i className="fas fa-file-pdf"></i> تحميل التقرير PDF
+            <button onClick={downloadPDF} className="btn-pdf">
+              <i className="fas fa-file-pdf"></i> تحميل PDF
             </button>
           </div>
 
-          <div id="results-to-print" style={{ padding: '20px', background: '#f8f9fa', borderRadius: '12px' }}>
+          <div id="results-to-print" className="print-area">
             <div className="grid-container">
               <ResultCard title="ملخص الحالة" icon="user" color="blue" data={analysisData.personal_summary} isList={false} />
               <ResultCard title="التاريخ المرضي" icon="heartbeat" color="red" data={analysisData.medical_history} />
@@ -199,12 +265,15 @@ export default function AIAnalyzer() {
   );
 }
 
-// Sub-component (يُفضل تعريفه خارج الـ Main Component)
+// --- Sub-component: Result Card ---
 function ResultCard({ title, icon, color, data, isList = true, fullWidth = false }: ResultCardProps) {
   return (
     <div className={`card result-card ${fullWidth ? 'full-width' : ''}`}>
       <div className={`card-header ${color}`}>
-        <i className={`fas fa-${icon}`}></i> {title}
+        <div className="header-content">
+           <i className={`fas fa-${icon}`}></i> 
+           <span>{title}</span>
+        </div>
       </div>
       <div className="card-body">
         {isList && Array.isArray(data) ? (

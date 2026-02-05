@@ -1,16 +1,16 @@
 // 1. Imports (موحدة كلها بنظام ES Modules)
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import multer from 'multer';
-import dotenv from 'dotenv';
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import multer from "multer";
+import dotenv from "dotenv";
 
 // 2. Load Environment Variables (لازم تكون في البداية)
 dotenv.config();
 
 // 3. Import Controllers & Models (تأكد من إضافة .js في الآخر)
-import * as analysisController from './controllers/analysisController.js';
-import Analysis from './models/Analysis.js';
+import * as analysisController from "./controllers/analysisController.js";
+import Analysis from "./models/Analysis.js";
 
 const app = express();
 
@@ -19,34 +19,34 @@ app.use(cors());
 app.use(express.json());
 
 // 5. Database Connection (استخدام متغير واحد واضح)
-const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/coaching_db';
+const mongoURI =
+  process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/coaching_db";
 
-mongoose.connect(mongoURI)
-    .then(() => console.log('✅ Connected to MongoDB'))
-    .catch(err => {
-        console.error('❌ MongoDB connection error:', err);
-        console.log('💡 Hint: Make sure MongoDB is installed and running on your machine!');
-    });
+mongoose
+  .connect(mongoURI)
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+    console.log(
+      "💡 Hint: Make sure MongoDB is installed and running on your machine!",
+    );
+  });
 
-// 6. Multer Config
 const upload = multer({ storage: multer.memoryStorage() });
 
-// 7. --- Routes ---
-
-// الترحيب
-app.get('/', (req, res) => res.send('AI Coaching API is running... 🚀'));
+app.get("/", (req, res) => res.send("AI Coaching API is running... 🚀"));
 
 // مسار التحليل الرئيسي
-app.post('/api/analyze', upload.single('file'), analysisController.analyzeFile);
+app.post("/api/analyze", upload.single("file"), analysisController.analyzeFile);
 
 // مسار السجل
-app.get('/api/history', async (req, res) => {
-    try {
-        const history = await Analysis.find().sort({ createdAt: -1 });
-        res.json(history);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+app.get("/api/history", async (req, res) => {
+  try {
+    const history = await Analysis.find().sort({ createdAt: -1 });
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // 8. تشغيل السيرفر
